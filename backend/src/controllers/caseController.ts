@@ -1,5 +1,6 @@
 import AppError from "../utils/AppError";
 import { Request, Response, NextFunction } from 'express';
+import pool from "../config/db";
 
 let cases = [
     {
@@ -24,74 +25,83 @@ let cases = [
 
 // @desc  Get all cases
 // @route  GET /api/cases
-export const getCases = (req: Request, res: Response, next: NextFunction) => {
-    const limit = parseInt(req.query.limit as string);
-
-    if (!isNaN(limit) && limit > 0) {
-        return res.status(200).json(cases.slice(0, limit))
-    } 
-
-    res.status(200).json(cases)
+export const getCases = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await pool.query('SELECT * FROM cases ORDER BY created_at DESC');
+        res.status(200).json(result.rows);
+    } catch (err) {
+        next(err);
+    }
 };
 
 // @desc  Get case by id
 // @route  GET /api/case/:id
-export const getCase = (req: Request, res: Response, next: NextFunction) => {
-    const id = parseInt(req.params.id as string);
-    const foundCase = cases.find((c) => c.id === id);
+export const getCase = async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const id = parseInt(req.params.id as string);
+        const result = await pool.query('SELECT * FROM cases WHERE id = $1', [id]);
 
-    if (!foundCase) {
-        return next(new AppError('Not found', 404));
-    } 
+        if (result.rows.length === 0) {
+            return next(new AppError('Not found', 404));
+        } 
 
-    res.status(200).json({foundCase});
+        res.status(200).json(result.rows[0]);
+    } catch (err) {
+        next(err);
+    }    
 };
 
 // @desc  Start a case
 // @route  POST /api/cases
-export const postCase = (req: Request, res: Response, next: NextFunction) => {
-    const newCase = {
-        id: cases.length + 1,
-        name: req.body.name,
-        description: req.body.description,
-        severity: req.body.severity || 'low',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        status: 'open'
-    };
+export const postCase = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { name, description, severity } = req.body;
 
-    const validSeverities = ['low', 'medium', 'high', 'critical'];
+        if (!name) {
+            return next(new AppError('Please include a case name', 400));
+        }
 
-    if (req.body.severity && !validSeverities.includes(req.body.severity)) {
-        return res.status(400).json({ msg: 'Severity must be low, medium, high, or critical' });
+        const validSeverities = ['low', 'medium', 'high', 'critical'];
+        if (severity && !validSeverities.includes(severity)) {
+            return next(new AppError('Severity must be low, medium, high, or critical', 400));
+        }
+
+        const result = await pool.query(
+            'INSERT INTO cases (name, description, severity) VALUES ($1, $2, $3) RETURNING *',
+            [name, description || '', severity || 'low']
+        );
+
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        next(err);
     }
-
-    if (!newCase.name) {
-        return next(new AppError('Not found', 404));
-    }
-
-    cases.push(newCase);
-
-    res.status(201).json(cases);
 };
 
 // @desc  Update a case
 // @route  PATCH /api/cases/:id
-export const patchCase = (req: Request, res: Response, next: NextFunction) => {
-    console.log('PATCH body:', req.body);
-    console.log('PATCH params:', req.params);
-    const id = parseInt(req.params.id as string);
-    const foundCase = cases.find((c) => c.id == id);
+export const patchCase = async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const id = parseInt(req.params.id as string);
+        const { name, description, severity, status } = req.body;
+        const result = await pool.query(
+        `UPDATE cases SET 
+            name = COALESCE($1, name),
+            description = COALESCE($2, description),
+            severity = COALESCE($3, severity),
+            status = COALESCE($4, status),
+            updated_at = NOW()
+    WHERE id = $5 
+    RETURNING *`,
+    [name, description, severity, status, id]);
 
-    if (!foundCase) {
-        return next(new AppError('Not found', 404));
+        if (result.rows.length === 0) {
+            return next(new AppError('Not found', 404));
+        } 
+
+        res.status(200).json(result.rows[0]);
+    } catch (err) {
+        next(err);
     }
-
-    if (req.body.name) foundCase.name = req.body.name;
-    if (req.body.description) foundCase.description = req.body.description;
-    if (req.body.severity) foundCase.severity = req.body.severity;
-    if (req.body.status) foundCase.status = req.body.status;
-    foundCase.updatedAt = new Date().toISOString();
-
-    res.status(200).json(cases)
+    
+    
 };
