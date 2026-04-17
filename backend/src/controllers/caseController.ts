@@ -1,5 +1,5 @@
-import express from 'express';
-const router = express.Router();
+import AppError from "../utils/AppError";
+import { Request, Response, NextFunction } from 'express';
 
 let cases = [
     {
@@ -22,36 +22,34 @@ let cases = [
     }
 ];
 
-//health check
-router.get('/health', (req, res) => {
-    res.json({
-        message: 'Server is running'
-    });
-});
-
-//Register a new user
-router.post('/auth/register', (req, res) => {
-
-});
-
-//Login a user
-router.post('/auth/login', (req, res) => {
-    
-});
-
-//Get all cases
-router.get('/', (req, res, next) => {
-    const limit = parseInt(req.query.limit);
+// @desc  Get all cases
+// @route  GET /api/cases
+export const getCases = (req: Request, res: Response, next: NextFunction) => {
+    const limit = parseInt(req.query.limit as string);
 
     if (!isNaN(limit) && limit > 0) {
         return res.status(200).json(cases.slice(0, limit))
     } 
 
     res.status(200).json(cases)
-});
+};
 
-//Post a new case
-router.post('/', (req, res, next) => {
+// @desc  Get case by id
+// @route  GET /api/case/:id
+export const getCase = (req: Request, res: Response, next: NextFunction) => {
+    const id = parseInt(req.params.id as string);
+    const foundCase = cases.find((c) => c.id === id);
+
+    if (!foundCase) {
+        return next(new AppError('Not found', 404));
+    } 
+
+    res.status(200).json({foundCase});
+};
+
+// @desc  Start a case
+// @route  POST /api/cases
+export const postCase = (req: Request, res: Response, next: NextFunction) => {
     const newCase = {
         id: cases.length + 1,
         name: req.body.name,
@@ -64,48 +62,29 @@ router.post('/', (req, res, next) => {
 
     const validSeverities = ['low', 'medium', 'high', 'critical'];
 
-    if (severity && !validSeverities.includes(severity)) {
+    if (req.body.severity && !validSeverities.includes(req.body.severity)) {
         return res.status(400).json({ msg: 'Severity must be low, medium, high, or critical' });
     }
 
     if (!newCase.name) {
-        const error = new Error(`Please include a case name`)
-        error.status = 404;
-        return next(error);
+        return next(new AppError('Not found', 404));
     }
-
-   
 
     cases.push(newCase);
 
     res.status(201).json(cases);
-});
+};
 
-//Get a case by id
-router.get('/:id', (req, res, next) => {
-    const id = parseInt(req.params.id);
-    const foundCase = cases.find((c) => c.id === id);
-
-    if (!foundCase) {
-        const error = new Error(`A case with the id of ${id} was not found`)
-        error.status = 404;
-        return next(error);
-    } 
-
-    res.status(200).json({foundCase});
-});
-
-//Update a case
-router.patch('/:id', (req, res, next) => {
+// @desc  Update a case
+// @route  PATCH /api/cases/:id
+export const patchCase = (req: Request, res: Response, next: NextFunction) => {
     console.log('PATCH body:', req.body);
     console.log('PATCH params:', req.params);
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     const foundCase = cases.find((c) => c.id == id);
 
     if (!foundCase) {
-        const error = new Error(`A case with the id of ${id} was not found`)
-        error.status = 404;
-        return next(error);
+        return next(new AppError('Not found', 404));
     }
 
     if (req.body.name) foundCase.name = req.body.name;
@@ -115,6 +94,4 @@ router.patch('/:id', (req, res, next) => {
     foundCase.updatedAt = new Date().toISOString();
 
     res.status(200).json(cases)
-});
-
-export default router;
+};
