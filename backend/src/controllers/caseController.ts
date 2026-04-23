@@ -2,26 +2,6 @@ import AppError from "../utils/AppError";
 import { Request, Response, NextFunction } from 'express';
 import pool from "../config/db";
 
-let cases = [
-    {
-        id: 1,
-        name: 'Case 1',
-        description: 'Description of Case 1',
-        severity: 'Severity of Case 1',
-        createdAt: 'Timestamp of Case 1 Creation',
-        updatedAt: 'Timestamp of Case 1 Last Modification',
-        status: 'Status of Case 1'
-    },
-    {
-        id: 2,
-        name: 'Case 2',
-        description: 'Description of Case 2',
-        severity: 'Severity of Case 2',
-        createdAt: 'Timestamp of Case 2 Creation',
-        updatedAt: 'Timestamp of Case 2 Last Modification',
-        status: 'Status of Case 2'
-    }
-];
 
 // @desc  Get all cases
 // @route  GET /api/cases
