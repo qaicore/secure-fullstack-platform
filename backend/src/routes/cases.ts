@@ -1,7 +1,10 @@
 import express from 'express';
 import { getCase, getCases, patchCase, postCase } from '../controllers/caseController.ts';
+import { authenticate } from '../middleware/authenticate.ts';
 const router = express.Router();
 
+//Authenticate routes
+router.use(authenticate);
 
 //Get all cases
 router.get('/', getCases);
