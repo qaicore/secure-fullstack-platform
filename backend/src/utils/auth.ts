@@ -23,3 +23,7 @@ export function signToken(payload: { userId: number; username: string}): string 
         secret,
         {expiresIn: expiration});
   }
+
+  export function verifyToken(token: string): { userId: number; username: string } {
+    return jwt.verify(token, secret) as { userId: number; username: string };
+  }
