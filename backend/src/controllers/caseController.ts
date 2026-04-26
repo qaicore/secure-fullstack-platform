@@ -36,6 +36,7 @@ export const getCase = async (req: Request, res: Response, next: NextFunction) =
 export const postCase = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { name, description, severity } = req.body;
+        const userId = req.user!.userId;
 
         if (!name) {
             return next(new AppError('Please include a case name', 400));
@@ -47,10 +48,10 @@ export const postCase = async (req: Request, res: Response, next: NextFunction) 
         }
 
         const result = await pool.query(
-            'INSERT INTO cases (name, description, severity) VALUES ($1, $2, $3) RETURNING *',
-            [name, description || '', severity || 'low']
-        );
-
+            'INSERT INTO cases (name, description, severity, created_by) VALUES ($1, $2, $3, $4) RETURNING *',
+            [name, description, severity, userId]
+          );
+          
         res.status(201).json(result.rows[0]);
     } catch (err) {
         next(err);
