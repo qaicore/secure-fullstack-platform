@@ -1,3 +1,4 @@
+import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
 import path from 'path';
@@ -16,6 +17,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+//CORS middleware
+app.use(cors({
+  origin: 'http://localhost:5173',
+}));
 
 // Body parser middleware
 app.use(express.json());
