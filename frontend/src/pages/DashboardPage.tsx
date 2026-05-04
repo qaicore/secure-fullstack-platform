@@ -1,5 +1,64 @@
+import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import axios from "axios";
+import { useEffect } from "react";
+
+interface Case {
+  id: number;
+  name: string;
+  description: string | null;
+  severity: string;
+  status: string;
+  createdBy: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 function DashboardPage() {
-    return <h2>Dashboard Page</h2>;
+  const [cases, setCases] = useState<Case[] | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
+
+  const {token} = useAuth();
+
+  useEffect(() => {
+    const fetchCases = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/cases', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setCases(response.data);
+
+      } catch (err) {
+        if (axios.isAxiosError(err) && err.response) {
+          setError(err.response.data.error || 'Failed to fetch cases');
+        } else {
+          setError('Network error');
+        }
+        
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCases();
+  }, [token]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
-  
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+  return (
+    <div>
+    {cases?.map(c => ( 
+      <div key={c.id}>
+        <strong>{c.name}</strong> - {c.severity} - {c.status}
+      </div>
+    ))}
+    </div>
+  );
+}
   export default DashboardPage;
