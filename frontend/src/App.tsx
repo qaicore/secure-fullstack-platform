@@ -1,6 +1,7 @@
 import { Routes, Route, Link } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -11,7 +12,12 @@ function App() {
       </nav>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+          }
+         />
       </Routes>
     </div>
   );
