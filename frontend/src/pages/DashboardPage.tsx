@@ -20,6 +20,9 @@ function DashboardPage() {
   const [error, setError] = useState<string>('');
 
   const {token} = useAuth();
+  const fetchCases = async () => {
+    
+  }
 
   useEffect(() => {
     const fetchCases = async () => {
