@@ -1,19 +1,8 @@
-import colors from 'colors';
+import { Request, Response, NextFunction } from 'express';
 
-const logger = (req, res, next) => {
-    const methodColors = {
-        GET: 'green',
-        POST: 'blue',
-        PATCH: 'yellow'
-    };
-
-    const color = methodColors[req.method] || white;
-    console.log(
-        `${req.method} ${req.protocol}://${req.get('host')}${req.originalUrl}`[
-            color
-        ]
-    );
-    next();
+const logger = (req: Request, res: Response, next: NextFunction) => {
+  console.log(`${req.method} ${req.protocol}://${req.get('host')}${req.originalUrl}`);
+  next();
 };
 
 export default logger;
