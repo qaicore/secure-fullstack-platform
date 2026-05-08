@@ -2,19 +2,14 @@ import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import AppError from './utils/AppError.js';
 import pool from './config/db.js';
-import authRouter from './routes/auth';
+import authRouter from './routes/auth.js';
 import cases from './routes/cases.js';
 import logger from './middleware/logger.js'
 import errorHandler from './middleware/error.js';
 import notFound from './middleware/notFound.js';
 const port = process.env.PORT || 8000;
-
-// Get the directory name
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 

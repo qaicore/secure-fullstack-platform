@@ -10,7 +10,6 @@ const auth_2 = require("../utils/auth");
 const auth_3 = require("../utils/auth");
 const db_1 = __importDefault(require("../config/db"));
 const AppError_1 = __importDefault(require("../utils/AppError"));
-const express_1 = require("express");
 async function register(req, res, next) {
     try {
         //retrieve username and password from req.body

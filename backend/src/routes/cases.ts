@@ -1,6 +1,6 @@
 import express from 'express';
-import { getCase, getCases, patchCase, postCase } from '../controllers/caseController.ts';
-import { authenticate } from '../middleware/authenticate.ts';
+import { getCase, getCases, patchCase, postCase } from '../controllers/caseController.js';
+import { authenticate } from '../middleware/authenticate.js';
 const router = express.Router();
 
 //Authenticate routes

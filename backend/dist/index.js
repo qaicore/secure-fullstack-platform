@@ -6,19 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const cors_1 = __importDefault(require("cors"));
 require("dotenv/config");
 const express_1 = __importDefault(require("express"));
-const path_1 = __importDefault(require("path"));
-const url_1 = require("url");
-const AppError_js_1 = __importDefault(require("./utils/AppError.js"));
 const db_js_1 = __importDefault(require("./config/db.js"));
-const auth_1 = __importDefault(require("./routes/auth"));
+const auth_js_1 = __importDefault(require("./routes/auth.js"));
 const cases_js_1 = __importDefault(require("./routes/cases.js"));
 const logger_js_1 = __importDefault(require("./middleware/logger.js"));
 const error_js_1 = __importDefault(require("./middleware/error.js"));
 const notFound_js_1 = __importDefault(require("./middleware/notFound.js"));
 const port = process.env.PORT || 8000;
-// Get the directory name
-const __filename = (0, url_1.fileURLToPath)(import.meta.url);
-const __dirname = path_1.default.dirname(__filename);
 const app = (0, express_1.default)();
 //CORS middleware
 app.use((0, cors_1.default)({
@@ -35,7 +29,7 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok' });
 });
 // Routes
-app.use('/auth', auth_1.default);
+app.use('/auth', auth_js_1.default);
 app.use('/api/cases', cases_js_1.default);
 // Error handler
 app.use(notFound_js_1.default);

@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.authenticate = authenticate;
 const auth_1 = require("../utils/auth");
 const AppError_1 = __importDefault(require("../utils/AppError"));
-const express_1 = require("express");
 function authenticate(req, res, next) {
     // 1. read req.headers.authorization
     const authHeader = req.headers.authorization;

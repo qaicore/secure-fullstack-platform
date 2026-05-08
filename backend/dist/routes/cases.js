@@ -4,18 +4,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const caseController_ts_1 = require("../controllers/caseController.ts");
-const authenticate_ts_1 = require("../middleware/authenticate.ts");
+const caseController_js_1 = require("../controllers/caseController.js");
+const authenticate_js_1 = require("../middleware/authenticate.js");
 const router = express_1.default.Router();
 //Authenticate routes
-router.use(authenticate_ts_1.authenticate);
+router.use(authenticate_js_1.authenticate);
 //Get all cases
-router.get('/', caseController_ts_1.getCases);
+router.get('/', caseController_js_1.getCases);
 //Post a new case
-router.post('/', caseController_ts_1.postCase);
+router.post('/', caseController_js_1.postCase);
 //Get a case by id
-router.get('/:id', caseController_ts_1.getCase);
+router.get('/:id', caseController_js_1.getCase);
 //Update a case
-router.patch('/:id', caseController_ts_1.patchCase);
+router.patch('/:id', caseController_js_1.patchCase);
 exports.default = router;
 //# sourceMappingURL=cases.js.map

@@ -1,3 +1,4 @@
-declare const errorHandler: (err: any, req: any, res: any, next: any) => void;
+import { Request, Response, NextFunction } from 'express';
+declare const errorHandler: (err: Error, req: Request, res: Response, next: NextFunction) => Response<any, Record<string, any>> | undefined;
 export default errorHandler;
 //# sourceMappingURL=error.d.ts.map
