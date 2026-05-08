@@ -7,6 +7,7 @@ function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -14,6 +15,14 @@ function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!username.trim() || !password.trim()) {
+      setError('Username and password are required');
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
       const response = await axios.post('http://localhost:8000/auth/login', {
         username,
@@ -30,6 +39,8 @@ function LoginPage() {
       } else {
         setError('Network error');
       }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -54,7 +65,8 @@ function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <button type="submit">Log in</button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Logging in...' : 'Log in'}</button>
       </form>
     </div>
   );

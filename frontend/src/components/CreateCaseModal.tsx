@@ -12,6 +12,7 @@ function CreateCaseModal({ onClose, onSuccess }: CreateCaseModalProps) {
     const [description, setDescription] = useState('');
     const [severity, setSeverity] = useState('low');
     const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const {token} = useAuth();
 
@@ -23,6 +24,8 @@ function CreateCaseModal({ onClose, onSuccess }: CreateCaseModalProps) {
             setError('Name is required');
             return;
         }
+
+        setIsSubmitting(true);
 
         try {
             await axios.post('http://localhost:8000/api/cases', 
@@ -38,6 +41,8 @@ function CreateCaseModal({ onClose, onSuccess }: CreateCaseModalProps) {
             } else {
                 setError('Network error');
             }
+        } finally {
+          setIsSubmitting(false);
         }
     };
 
@@ -96,8 +101,10 @@ function CreateCaseModal({ onClose, onSuccess }: CreateCaseModalProps) {
                 </select>
               </div>
               {error && <p style={{ color: 'red' }}>{error}</p>}
-              <button type="submit">Create</button>
-              <button type="button" onClick={onClose}>Cancel</button>
+              <button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? 'Creating...': 'Create'}
+                </button>
+              <button type="button" onClick={onClose} disabled={isSubmitting}>Cancel</button>
             </form>
           </div>
         </div>
