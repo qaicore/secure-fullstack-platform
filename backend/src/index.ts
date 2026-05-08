@@ -43,6 +43,16 @@ app.listen(port, () => console.log(`Server is running on port ${port}`));
 
 // Database Test
 
-pool.query('SELECT NOW()')
-    .then(res => console.log('DB connected:', res.rows[0].now))
-    .catch(err => console.error('DB connection error:', err));
+async function start() {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    console.log('DB connected:', result.rows[0].now);
+  } catch (err) {
+    console.error('DB connection failed:', err);
+    process.exit(1);
+  }
+
+  app.listen(port, () => console.log(`Server is running on port ${port}`));
+}
+
+start();
