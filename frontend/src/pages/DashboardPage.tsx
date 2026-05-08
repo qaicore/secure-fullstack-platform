@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { useEffect } from "react"
 import CreateCaseModal from '../components/CreateCaseModal';
+import { useNavigate } from "react-router-dom";
 
 interface Case {
   id: number;
@@ -21,7 +22,9 @@ function DashboardPage() {
   const [error, setError] = useState<string>('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const {token} = useAuth();
+  const { token, logout } = useAuth();
+  const navigate = useNavigate();
+
   const fetchCases = async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/cases', {
@@ -43,6 +46,11 @@ function DashboardPage() {
     }
   }
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   useEffect(() => {
     fetchCases();
   }, [token]);
@@ -55,6 +63,7 @@ function DashboardPage() {
   }
   return (
     <div>
+      <button onClick={handleLogout}>Logout</button>
       <button onClick={() => setIsModalOpen(true)}>New Case</button>
 
       {cases?.map(c => ( 
@@ -71,5 +80,6 @@ function DashboardPage() {
         )}
       </div>
     );
-}
-  export default DashboardPage;
+  }
+
+export default DashboardPage;
