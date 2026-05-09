@@ -1,6 +1,6 @@
 # Secure Full-Stack Platform
 
-This is a case management application I built for security analysts conducting audits. Each phase of this project adds a new production concern on top of a working system. I started with auth and CRUD first, then containerization, CI/CD, observability, Kubernetes, and security hardening.
+This is a case management application I built for security analysts conducting audits. Each phase of this project adds a new production concern on top of a working system. I started with auth and CRUD first, then containerization. Later on, CI/CD, observability, Kubernetes, and security hardening will be implemented
 
 Currently shipped: phases A and B (full-stack web app with JWT auth, all services 
 containerized via Docker). Roadmap below.
