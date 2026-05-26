@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 
 interface CreateCaseModalProps {
     onClose: () => void;
