@@ -1,9 +1,10 @@
 # Secure Full-Stack Platform
 
-This is a case management application I built for security analysts conducting audits. Each phase of this project adds a new production concern on top of a working system. I started with auth and CRUD first, then containerization. Later on, CI/CD, observability, Kubernetes, and security hardening will be implemented
+A case management application for security analysts conducting audits. Each phase adds a new production concern on top of a working system — starting with auth and CRUD, then containerization, then CI/CD. Observability, Kubernetes, and security hardening come next.
 
-Currently shipped: phases A and B (full-stack web app with JWT auth, all services 
-containerized via Docker). Roadmap below.
+Currently shipped: phases A, B, and C (full-stack web app with JWT auth, containerized via Docker, automated CI on every PR). Roadmap below.
+
+![CI](https://github.com/qaicore/secure-fullstack-platform/actions/workflows/ci.yml/badge.svg)
 
 ## Stack
 
@@ -11,33 +12,35 @@ containerized via Docker). Roadmap below.
 - **Backend:** Node.js + Express + TypeScript  
 - **Database:** PostgreSQL 15
 - **Infra:** Docker + docker-compose, nginx
+- **CI:** GitHub Actions
 
 ## What's working today
 
 - JWT-based authentication with bcrypt password hashing (cost 10)
-- Generic error messages to prevent user enumeration
+- Generic error messages on login failures to prevent user enumeration
 - Authenticated routes guarded by JWT middleware
 - Type-augmented Express `Request` object (`req.user` typed across the codebase)
 - Frontend auth context with in-memory token storage (no localStorage; XSS-resistant)
 - Protected client-side routes that redirect unauthenticated users
 - React Router with nginx fallback to `index.html` for client-side routes
 - Multi-stage Docker builds (build vs runtime image separation)
-- Container orchestration via docker-compose with healthchecks
+- Container orchestration via docker-compose with database healthcheck
 - Database schema auto-initialized on first run via `init.sql`
 - Fail-fast backend startup (exits if DB unreachable)
+- CI pipeline runs lint, image builds, and secret scanning on every PR
 
 ## Getting started
 
 Requirements: Docker Desktop. No Node, no Postgres install needed.
 
 ```bash
-git clone 
+git clone https://github.com/qaicore/secure-fullstack-platform.git
 cd secure-fullstack-platform
 
 # Set up secrets
 cp .env.example .env
 # Open .env and replace JWT_SECRET with a real value
-# (PowerShell: [Convert]::ToBase64String((1..64 | %{ Get-Random -Max 256 })))
+# PowerShell: [Convert]::ToBase64String((1..64 | %{ Get-Random -Max 256 }))
 
 docker-compose up --build
 ```
@@ -55,13 +58,25 @@ curl -X POST http://localhost:8000/auth/register \
 Then log in via the UI.
 
 ## Architecture
+
 ┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
-│   Frontend      │ HTTPS   │    Backend      │ Internal│    Postgres     │
+│   Frontend      │  HTTP   │    Backend      │Internal │    Postgres     │
 │   nginx + React │ ──────► │  Express + JWT  │ ──────► │   15 + init.sql │
-│   Port 5173     │         │   Port 8000     │  network│   Port 5432     │
+│   Port 5173     │         │   Port 8000     │ network │   Port 5432     │
 └─────────────────┘         └─────────────────┘         └─────────────────┘
 
-All three services live on a shared docker-compose network. The backend reaches Postgres at `db:5432` (service name); the frontend reaches the backend at `localhost:8000` (browser-side, same as host).
+All three services live on a shared docker-compose network. The backend reaches Postgres at `db:5432` (the service name resolves via Docker's internal DNS); the frontend reaches the backend at `localhost:8000` from the browser, same as the host.
+
+## Continuous integration
+
+Every pull request runs four parallel jobs:
+
+- **Backend lint** — ESLint on `backend/src/`
+- **Frontend lint** — ESLint on `frontend/src/`
+- **Build images** — verifies both Dockerfiles still build
+- **Secret scan** — gitleaks scan of the full git history
+
+Pushes to `main` run the same workflow. Failed checks block merge.
 
 ## Useful commands
 
@@ -77,9 +92,8 @@ docker-compose logs -f backend  # tail backend logs
 
 - [x] Phase A — full-stack web app with auth
 - [x] Phase B — containerization (Docker + docker-compose)
-- [ ] Phase C — CI/CD pipeline (GitHub Actions, secret scanning)
+- [x] Phase C — CI/CD pipeline (GitHub Actions, secret scanning)
 - [ ] Phase D — Redis caching + Prometheus/Grafana observability
 - [ ] Phase E — Kubernetes deployment with Helm
 - [ ] Phase F — Security hardening (SAST, DAST, SBOM, threat model)
 - [ ] Phase G — Java Spring Boot analytics microservice
-
