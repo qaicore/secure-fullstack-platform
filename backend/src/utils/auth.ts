@@ -1,6 +1,5 @@
 import bcrypt from "bcryptjs";
 import 'dotenv/config';
-import jwt, { SignOptions } from "jsonwebtoken";
 
 export type JwtPayload = {
   userId: number;

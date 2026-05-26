@@ -1,8 +1,6 @@
 import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
-import path from 'path';
-import AppError from './utils/AppError.js';
 import pool from './config/db.js';
 import authRouter from './routes/auth.js';
 import cases from './routes/cases.js';
