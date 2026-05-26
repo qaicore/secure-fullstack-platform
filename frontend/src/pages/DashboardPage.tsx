@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
+import { useCallback } from "react";
 import axios from "axios";
 import { useEffect } from "react"
 import CreateCaseModal from '../components/CreateCaseModal';
@@ -25,7 +26,7 @@ function DashboardPage() {
   const { token, logout } = useAuth();
   const navigate = useNavigate();
 
-  const fetchCases = async () => {
+  const fetchCases = useCallback(async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/cases', {
         headers: {
@@ -44,8 +45,7 @@ function DashboardPage() {
     } finally {
       setIsLoading(false);
     }
-  }
-
+  }, [token]);
 
   const handleLogout = () => {
     logout();
@@ -53,8 +53,9 @@ function DashboardPage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCases();
-  }, [token]);
+  }, [fetchCases]);
 
   if (isLoading) {
     return <div>Loading...</div>;
