@@ -59,12 +59,13 @@ Then log in via the UI.
 
 ## Architecture
 
+```
 ┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
 │   Frontend      │  HTTP   │    Backend      │Internal │    Postgres     │
 │   nginx + React │ ──────► │  Express + JWT  │ ──────► │   15 + init.sql │
 │   Port 5173     │         │   Port 8000     │ network │   Port 5432     │
 └─────────────────┘         └─────────────────┘         └─────────────────┘
-
+```
 All three services live on a shared docker-compose network. The backend reaches Postgres at `db:5432` (the service name resolves via Docker's internal DNS); the frontend reaches the backend at `localhost:8000` from the browser, same as the host.
 
 ## Continuous integration
